@@ -1,0 +1,213 @@
+---
+title: "Reflection on Labelled Data in R"
+subtitle: "Restaurant at Kellogg Ranch CEP"
+author: "Georgia Monjarrez"
+institute: "IBM 6500, Cal Poly Pomona"
+date: "2026-10-28"
+format:
+  revealjs:
+    theme: serif
+    width: 1600
+    height: 900
+    slide-number: true
+    transition: slide
+    scrollable: true
+    smaller: true
+    embed-resources: true
+    footer: "Georgia Monjarrez · W10 Reflection"
+    include-in-header:
+      text: |
+        <style>
+        .reveal {font-size: 32px; color: #25372e;}
+        .reveal h1,.reveal h2 {color: #244c3c;}
+        .reveal h2 {font-size: 1.65em;}
+        .reveal p,.reveal li {line-height: 1.4;}
+        .prompt {border-left: 5px solid #b39552; padding: 5px 20px; background: #f5f2e9; font-size: .79em;}
+        .source {font-size: .65em; color: #555;}
+        .reveal table {font-size: .78em;}
+        </style>
+editor: visual
+execute:
+  echo: true
+---
+
+## Scope of this reflection
+
+This reflection connects labelled survey data and data preparation to my Restaurant at Kellogg Ranch (RKR) CEP, especially **AO4: website content, navigation, and usability**.
+
+AO4 considers whether users can find menus, identify operating hours, and reach the reservation interface. It distinguishes task success, completion time, and perceived ease.
+
+**Course context:** The module places the Case 31 workshop in Step 2, initial COVID-19 study cleaning in Step 3, and further cleaning in Step 4. The reflection prompt uses earlier step numbers. Here, I follow the topics in the prompt. Workshop details and initial-cleaning topics come from the supplied module screenshots. The further-cleaning page identifies the same COVID-19 study and shows a report outline that includes functions, frequency distributions, and exploratory data analysis. The screenshots do not establish the detailed exclusion rules or before-and-after sample counts. The comparison therefore separates visible course topics from my proposed applications.
+
+## 1. Labelled data and my CEP
+
+::: {.prompt}
+**Prompt:** In Step 1, you learned how to read SPSS data into RStudio and conduct EDA and hypothesis testing. What is labelled data? Does your MSDM CEP involve labelled data? Explain why or why not.
+:::
+
+Labelled data attaches descriptive information to variables or their values. For example, a website-ease question might use 1 for “very difficult” and 5 for “very easy.” The numbers store the responses, while the labels explain their meaning. Variable labels can preserve the full question wording.
+
+My CEP involves survey responses whose numeric codes need clear meanings. AO4’s planned ease ratings and coded task outcomes are suitable examples. Whether the exported file actually contains SPSS-style label attributes depends on the export format. A CSV may require a separate codebook, while an SPSS export can retain labels.
+
+::: {.source}
+Source: [haven: Conversion semantics](https://haven.tidyverse.org/articles/semantics.html).
+:::
+
+## Preserving meaning when importing data
+
+My main takeaway is that a numeric column does not explain itself. I need to inspect question wording, value labels, missing-value definitions, and variable types before choosing an analysis.
+
+An illustrative AO4 coding scheme would distinguish **failed**, **successful**, **assisted**, and **not attempted** task outcomes. “Not attempted” should not automatically become failure. Likewise, an unanswered ease question should not become a score of zero.
+
+In R, `haven::read_sav()` imports SPSS files. Its default handling converts declared user-missing values to `NA`. I would verify the codebook and use appropriate categorical representations for group labels while retaining valid numeric measurements for time in seconds. These choices prevent accidental calculations on arbitrary category codes.
+
+::: {.source}
+Source: [haven: Read and write SPSS files](https://haven.tidyverse.org/reference/read_spss.html). The AO4 coding scheme above is illustrative.
+:::
+
+## 1. Techniques relevant to AO4
+
+::: {.prompt}
+**Prompt:** What techniques are relevant for your MSDM CEP? Please elaborate on how these approaches might help you address your AO for CEP.
+:::
+
+Exploratory data analysis would help me understand where participants encounter difficulty. I would report task completion counts and percentages, show the distribution of ease ratings, and examine completion times for successful, unassisted attempts. Medians would help summarize times when a few unusually long attempts affect the mean.
+
+I would compare the menu, hours, and reservation tasks separately. A low completion rate for one task would identify a specific area for investigation. Participant comments could help explain whether the difficulty involved navigation, unclear wording, or missing information.
+
+These summaries would support recommendations tied to observed problems. They would not, by themselves, show that website changes increase reservations or revenue.
+
+## Reliability, factors, and composite scores
+
+The Case 31 workshop summary identifies reliability analysis, exploratory factor analysis, and composite indices as part of the workflow. Its timestamp outline places recoding and labels at 55:15, factor analysis and reliability at 56:19, and row-mean composite indices at 1:02:06.
+
+For my CEP, these methods would be relevant if several survey items were designed to measure the same underlying concept, such as perceived website ease. I would first inspect their wording and coding, including any reverse-coded items. Reliability would help assess consistency, while factor analysis could explore whether the items reflect a shared dimension, subject to adequate data and suitable assumptions.
+
+I would not automatically combine task success, time, and ease into one score. They measure different aspects of usability and use different units. Even the three task-ease ratings may reflect meaningful differences between tasks. A composite would need a clear rationale and an explicit rule for missing items.
+
+::: {.source}
+Source: supplied Case 31 module summary and timestamp outline. These are proposed applications to AO4, not completed analyses.
+:::
+
+## Group comparisons and hypothesis testing
+
+::: {.columns}
+::: {.column width="50%"}
+### Possible comparisons
+
+- Task success by device type.
+- Ease ratings by prior website familiarity.
+- Completion time by participant group.
+
+These are proposed comparisons, not findings.
+:::
+::: {.column width="50%"}
+### Conditions for interpretation
+
+Choose tests based on the variable types, sample size, and study design. Sparse categorical tables may require exact methods. Repeated tasks from the same participant are related observations.
+:::
+:::
+
+I would begin with descriptive results and uncertainty, then consider justified tests. Any association between familiarity and success could have several explanations. A convenience sample would also limit how confidently I could generalize to all RKR guests.
+
+::: notes
+A participant performs multiple tasks, so treating every task attempt as an independent person can exaggerate the evidence. Keep participant identifiers available for appropriate analysis while protecting identity.
+:::
+
+## 2. Initial data cleaning
+
+::: {.prompt}
+**Prompt:** In Step 2, you saw the initial data cleaning process. Describe it and what lessons you got from it.
+:::
+
+The module identifies this example as **Initial Data Preparation for the Covid-19 Study**, using survey data from a consumer panel. The visible report outline includes combining Prolific data from two waves, exploring the panel data, importing SPSS data, and joining the survey data with Prolific data. This shows that preparation includes connecting data sources before analyzing responses.
+
+The outline also lists initial criteria involving consent, survey checks, and duration, followed by demographic and system-generated data checks. The screenshot establishes these topics, but does not show the exact rules or the number removed by each rule.
+
+My takeaway is that a usable dataset requires both accurate linkage and defensible screening. For RKR, I would verify study codes before linking survey ratings to task observations, confirm the meaning of each row, and document eligibility and consent decisions. A mismatched join could assign one person's ease rating to another person's task result even when every individual value looks valid.
+
+::: {.source}
+Source: module Step 3 screenshot and visible outline of “Initial Cleaning with EDA for Covid-19.” Specific thresholds and final sample size were not available.
+:::
+
+## Collection quality supports cleaning
+
+The M14 fieldwork slides emphasize consistent question wording, correct question order, skip instructions, neutral probing, and accurate recording. They also describe supervision and validation as ways to check whether procedures were followed.
+
+For AO4, those principles support giving participants consistent task instructions and recording help, timeouts, and task outcomes in the same way. If one tester gives navigation hints while another does not, a difference in success may reflect administration rather than website usability.
+
+I would pilot the instructions and recording sheet before collecting the main data. I would also preserve participants’ original comments instead of replacing them with my interpretation. Cleaning can flag problems, but it cannot fully recover information that was never recorded correctly.
+
+::: {.source}
+Source: supplied M14 fieldwork slides, especially slides 8–15.
+:::
+
+## 3. Further cleaning and exploratory review
+
+::: {.prompt}
+**Prompt:** In Step 3, you saw the next phase of data cleaning. Describe it and what the key takeaways are.
+:::
+
+The module's Step 4 is **Further Cleaning of Data for the Covid-19 Study**, a continuation using consumer-panel survey data. The visible report outline includes creating a function, a frequency-distribution table, and exploratory data analysis across survey sections. This indicates a more detailed review of the prepared data, although the screenshot does not reveal the function's exact purpose or the exclusion decisions.
+
+Frequency tables can help identify unexpected codes, empty categories, and unusual response distributions. Reviewing related questions can also reveal inconsistencies that a single-column check might miss. These are ways I would apply the visible topics, rather than claims about the video's unseen results.
+
+My takeaway is that importing and initially screening a file does not end preparation. For RKR, I would examine distributions of task outcomes and ease ratings, verify unusual timings against observation notes, and document decisions. A slow or unsuccessful attempt may reveal a real navigation problem, so it should not automatically trigger exclusion.
+
+::: {.source}
+Source: supplied Step 4 page and visible “Further Cleaning for Covid-19” report outline. Specific screening rules and resulting sample sizes are not visible.
+:::
+
+## 4. Comparing the approaches
+
+::: {.prompt}
+**Prompt:** What are the big differences between the two approaches and the impact on the final sample size and response quality?
+:::
+
+The initial outline emphasizes combining sources and applying initial checks. The further-cleaning outline shows frequency distributions and additional exploratory review. Both stages can involve quality checks. The comparison below uses those visible topics, with likely consequences explained conceptually because the screenshots do not show the detailed decisions.
+
+| Dimension | Initial preparation | Further cleaning and review |
+|---|---|---|
+| Main question | Are sources linked and initial criteria addressed? | What do distributions and closer review reveal? |
+| Visible topics | Panel/survey linkage, consent and survey checks | Functions, frequency tables, exploratory review |
+| Action | Recode, restructure, verify | Flag, investigate, retain or exclude |
+| Sample impact | May preserve rows while fixing values | May reduce the retained sample |
+
+Both stages can affect sample size. Neither stage guarantees an improvement simply because it removes more records.
+
+## Sample size, quality, and bias
+
+Stricter screening can remove unusable responses, but fewer observations generally leave more uncertainty and less capacity to compare small groups. Selective exclusions can also distort the sample. For example, removing slow mobile users could hide a usability problem that AO4 is supposed to identify.
+
+For each rule, I would record how many unique participants and task records were flagged and excluded, allowing for overlap between flags. I would report the final denominator for each task and measure because missing ratings and failed tasks affect different summaries.
+
+::: {.fragment}
+**My decision:** retain valid evidence of difficulty. Summarize successful unassisted times separately, but report failures, assistance, and timeouts rather than deleting them from the study. Where a screening decision is uncertain, compare conclusions with and without the flagged records.
+:::
+
+No before-and-after sample sizes are reported here because the course cleaning dataset and actual CEP responses were not supplied.
+
+## Application to my RKR project
+
+::: {.incremental}
+- Preserve the original data, labels, codebook, and collection instructions.
+- Keep participant identifiers and task identifiers distinct.
+- Check coding and missing values before calculating results.
+- Review response-quality flags using documented rules.
+- Report task success, successful completion time, and ease separately.
+- Connect findings to specific menu, hours, or reservation navigation issues.
+:::
+
+This reflection helps me see data preparation as part of answering AO4 responsibly. Clear coding preserves what participants meant, while careful screening helps me judge which records support each analysis. I would use both to produce recommendations that the evidence can support.
+
+## References and course-material status
+
+- **Course assignment:** W10 reflection instructions supplied in screenshots.
+- **Course slides:** *M14 – Field Work: Data Collection*, slides 8–15. Used for collection procedures, supervision, and validation.
+- **Project context:** Existing RKR CEP report, AO4, “Website Content, Navigation, and Usability,” and the planned AO4 methods. These describe planned research rather than completed findings.
+- **haven documentation:** [Conversion semantics](https://haven.tidyverse.org/articles/semantics.html) and [Read and write SPSS files](https://haven.tidyverse.org/reference/read_spss.html).
+- **Quarto documentation:** [Reveal.js presentations](https://quarto.org/docs/presentations/revealjs/).
+
+**Course screenshots:** Case 31 workshop summary and timestamp outline, initial COVID-19 study cleaning page and report outline, and further COVID-19 study cleaning page and report outline. Descriptions are based on the visible written material.
+
+**Source scope:** The embedded videos were not accessible. Exact exclusion thresholds, detailed function behavior, and sample counts are not visible in the screenshots. The reflection therefore makes no numerical claims about those demonstrations. Proposed RKR procedures are applications of the material, not reported CEP findings.
